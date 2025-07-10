@@ -1,3 +1,7 @@
+// main.js - Versión 2025-07-10-18:40:00 (Final para usuario)
+// Importante: Eliminar console.logs para versión final de producción
+//            El cache-busting en index.html fuerza la recarga.
+
 const clientId = "64713983477-nk4rmn95cgjsnab4gmp44dpjsdp1brk2.apps.googleusercontent.com";
 const SPREADSHEET_ID = "1T8YifEIUU7a6ugf_Xn5_1edUUMoYfM9loDuOQU1u2-8"; // ID de tu Google Sheet
 const SHEET_NAME_OBAMACARE = "Pólizas"; // Nombre de la hoja principal
@@ -10,13 +14,14 @@ let tokenClient;
 let accessToken = null;
 let gapiInitialized = false;
 let statusTimeout; 
+let isPageFullyLoaded = false; // Bandera para controlar la carga de la página
 
 // Elementos del DOM - Botones y Contenedores principales
 const loginBtn = document.getElementById("loginBtn");
 const dataForm = document.getElementById("dataForm");
 const submitBtn = document.getElementById("submitBtn");
 const fileInput = document.getElementById("fileInput");
-const statusDiv = document.getElementById("status");
+const statusMessageDiv = document.getElementById("statusMessage"); 
 
 // Elementos para las pestañas
 const tabButtons = document.querySelectorAll('.tabs-nav .tab-button');
@@ -24,8 +29,8 @@ const tabContents = document.querySelectorAll('.tab-content');
 
 // Elementos del DOM - Campos de Obamacare
 const cantidadDependientesInput = document.getElementById("cantidadDependientes");
-const addDependentsBtn = document.getElementById("addDependentsBtn"); // Botón para abrir modal
-const editDependentsBtn = document.getElementById("editDependentsBtn"); // Botón de edición de dependientes
+const addDependentsBtn = document.getElementById("addDependentsBtn"); 
+const editDependentsBtn = document.getElementById("editDependentsBtn"); 
 const hasPoBoxCheckbox = document.getElementById('hasPoBox');
 const poBoxAddressContainer = document.getElementById('poBoxAddressContainer');
 const direccionCalleInput = document.getElementById('direccionCalle');
@@ -38,6 +43,7 @@ const socialInput = document.getElementById('social');
 const ingresosInput = document.getElementById('ingresos');
 const creditoFiscalInput = document.getElementById('creditoFiscal');
 const primaInput = document.getElementById('prima');
+const fechaNacimientoInput = document.getElementById('fechaNacimiento'); 
 
 // Elementos del DOM - Modal de Dependientes
 const dependentsModal = document.getElementById('dependentsModal');
@@ -55,7 +61,7 @@ const pagoTarjetaContainer = document.getElementById('pagoTarjetaContainer');
 const numTarjetaInput = document.getElementById('numTarjeta');
 const fechaVencimientoInput = document.getElementById('fechaVencimiento');
 const cvcInput = document.getElementById('cvc'); 
-const titularTarjetaInput = document.getElementById('titularTarjeta'); // Asegurarse de tener la referencia
+const titularTarjetaInput = document.getElementById('titularTarjeta'); 
 
 
 // Variable para almacenar dependientes temporalmente
@@ -71,13 +77,13 @@ let currentTitularClientId = null; // Para vincular datos entre hojas
  */
 function displayStatus(msg, type = 'info', duration = 5000) {
     clearTimeout(statusTimeout); 
-    statusDiv.textContent = msg;
-    statusDiv.className = `visible ${type}`; 
+    statusMessageDiv.textContent = msg;
+    statusMessageDiv.className = `visible alert-${type === 'error' ? 'danger' : type}`; 
     
     if (duration > 0) {
         statusTimeout = setTimeout(() => {
-            statusDiv.className = ''; 
-            statusDiv.textContent = '';
+            statusMessageDiv.className = ''; 
+            statusMessageDiv.textContent = '';
         }, duration);
     }
 }
@@ -129,7 +135,6 @@ async function initGapiClient() {
         await gapi.client.load('drive', 'v3'); 
         
         gapiInitialized = true;
-        console.log("gapi.client inicializado y APIs de Sheets/Drive cargadas.");
     } catch (error) {
         console.error("Error al inicializar gapi.client para Sheets/Drive API:", error);
         displayStatus("Error crítico: No se pudo inicializar la API de Sheets/Drive. Revisa la consola.", 'error', 10000);
@@ -157,6 +162,16 @@ window.onload = () => {
     // Ocultar contenedores de pago al cargar la página
     pagoBancoContainer.style.display = 'none';
     pagoTarjetaContainer.style.display = 'none';
+
+    // Ocultar botones de dependientes al cargar la página
+    addDependentsBtn.style.display = 'none';
+    editDependentsBtn.style.display = 'none';
+
+    // Iniciar la primera pestaña activa por defecto
+    document.getElementById('tab-obamacare').style.display = 'block';
+    tabButtons[0].classList.add('active'); // Activa el primer botón de pestaña
+
+    isPageFullyLoaded = true; // La página ha cargado completamente y los valores iniciales están listos
 };
 
 // Event Listeners de la UI
@@ -197,6 +212,30 @@ ingresosInput.addEventListener('focus', () => unformatCurrencyInput(ingresosInpu
 creditoFiscalInput.addEventListener('focus', () => unformatCurrencyInput(creditoFiscalInput));
 primaInput.addEventListener('focus', () => unformatCurrencyInput(primaInput));
 
+// Lógica para formato de Fecha de Nacimiento (mm/dd/aaaa) para INPUT TYPE="TEXT"
+fechaNacimientoInput.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, ''); 
+    let formattedValue = '';
+    if (value.length > 0) {
+        formattedValue = value.substring(0, 2); // MM
+        if (value.length > 2) {
+            formattedValue += '/' + value.substring(2, 4); // MM/DD
+        }
+        if (value.length > 4) {
+            formattedValue += '/' + value.substring(4, 8); // MM/DD/YYYY
+        }
+    }
+    e.target.value = formattedValue;
+});
+fechaNacimientoInput.addEventListener('blur', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length === 8) { 
+        e.target.value = `${value.substring(0,2)}/${value.substring(2,4)}/${value.substring(4,8)}`;
+    } else if (value.length > 0 && value.length < 8) {
+        displayStatus("Formato de fecha incorrecto. Use MM/DD/AAAA.", 'error');
+    }
+});
+
 
 // Lógica de Pestañas
 tabButtons.forEach(button => {
@@ -236,7 +275,10 @@ pagoTarjetaRadio.addEventListener('change', () => {
 addDependentsBtn.addEventListener('click', () => openDependentsModal(false)); // Abrir para agregar/primera vez
 editDependentsBtn.addEventListener('click', () => openDependentsModal(true)); // Abrir para editar
 
-cantidadDependientesInput.addEventListener('change', () => {
+// Lógica para controlar la visibilidad de los botones de dependientes.
+// El modal NO se abre automáticamente BAJO NINGUNA CIRCUNSTANCIA por un 'input' en cantidadDependientesInput.
+// El usuario DEBE hacer click en 'Agregar' o 'Editar'.
+cantidadDependientesInput.addEventListener('input', () => {
     const num = parseInt(cantidadDependientesInput.value);
     
     // Validar y controlar visibilidad de botones
@@ -250,15 +292,16 @@ cantidadDependientesInput.addEventListener('change', () => {
     }
 
     if (num > 0) {
-        // Si ya hay datos y se ajusta el número, ajustar el array para precargar o añadir
+        // Ajustar `currentDependentsData` al nuevo `num`
         if (currentDependentsData.length !== num) {
             currentDependentsData = currentDependentsData.slice(0, num);
             for(let i = currentDependentsData.length; i < num; i++) {
                 currentDependentsData.push({}); 
             }
-        }
-        // Mostrar el botón de editar si ya se guardaron dependientes antes o el de agregar si es nuevo
-        if (currentDependentsData.some(dep => Object.keys(dep).length > 0)) { // Si ya hay algún dato en currentDependentsData
+        } 
+        
+        // Controlar la visibilidad de los botones:
+        if (currentDependentsData.some(dep => Object.keys(dep).length > 0)) { 
             editDependentsBtn.style.display = 'block';
             addDependentsBtn.style.display = 'none';
         } else {
@@ -266,11 +309,7 @@ cantidadDependientesInput.addEventListener('change', () => {
             addDependentsBtn.style.display = 'block';
         }
         
-        // Abrir el modal automáticamente si es la primera vez que se pone >0 o si se acaba de ajustar el número y está vacío
-        if ((num > 0 && currentDependentsData.length === 0) || (num > 0 && currentDependentsData.some(dep => Object.keys(dep).length === 0))) {
-             openDependentsModal(false); // Abrir para agregar si no hay datos o hay vacíos
-        }
-
+        // El modal YA NO se abre automáticamente aquí. Solo se abre con click.
     } else { // num === 0
         currentDependentsData = []; 
         addDependentsBtn.style.display = 'none';
@@ -278,8 +317,9 @@ cantidadDependientesInput.addEventListener('change', () => {
     }
 });
 
+
 closeModalButton.addEventListener('click', () => {
-    dependentsModal.style.display = 'none';
+    dependentsModal.classList.remove('modal-show'); // Usar clase para ocultar
 });
 
 saveDependentsBtn.addEventListener('click', () => {
@@ -288,6 +328,14 @@ saveDependentsBtn.addEventListener('click', () => {
         const parentesco = document.getElementById(`modal_dep${i}_parentesco`).value;
         const nombre = document.getElementById(`modal_dep${i}_nombre`).value;
         const apellido = document.getElementById(`modal_dep${i}_apellido`).value;
+        const fechaNacimiento = document.getElementById(`modal_dep${i}_fechaNacimiento`).value;
+
+        // Validar formato de fecha en el modal
+        if (fechaNacimiento && !/^\d{2}\/\d{2}\/\d{4}$/.test(fechaNacimiento)) {
+            displayStatus(`Formato de fecha incorrecto para Dependiente #${i+1}. Use MM/DD/AAAA.`, 'error');
+            return;
+        }
+
         if (!parentesco || !nombre || !apellido) {
             displayStatus(`Faltan campos requeridos para el Dependiente #${i+1}.`, 'error');
             return; 
@@ -295,15 +343,15 @@ saveDependentsBtn.addEventListener('click', () => {
     }
 
     saveDependentsFromModal();
-    dependentsModal.style.display = 'none';
+    dependentsModal.classList.remove('modal-show'); // Usar clase para ocultar
     editDependentsBtn.style.display = 'block'; 
-    addDependentsBtn.style.display = 'none'; // Asegurarse que Agregar está oculto
+    addDependentsBtn.style.display = 'none'; 
 });
 
 // Cierra el modal si se hace clic fuera de su contenido
 window.addEventListener('click', (event) => {
     if (event.target === dependentsModal) {
-        dependentsModal.style.display = 'none';
+        dependentsModal.classList.remove('modal-show'); // Usar clase para ocultar
     }
 });
 
@@ -338,7 +386,7 @@ function openDependentsModal(forEdit) {
     if (isNaN(num) || num <= 0) {
         displayStatus("Introduce una cantidad válida y mayor a 0 para dependientes.", 'error');
         cantidadDependientesInput.value = 0; 
-        addDependentsBtn.style.display = 'none'; // Ocultar botón si no hay dependientes
+        addDependentsBtn.style.display = 'none'; 
         editDependentsBtn.style.display = 'none';
         return;
     }
@@ -357,7 +405,7 @@ function openDependentsModal(forEdit) {
     for (let i = 0; i < num; i++) {
         const dep = currentDependentsData[i] || {}; 
         const div = document.createElement("div");
-        div.className = "dependent-card"; // Apply dependent-card class for styling
+        div.className = "dependent-card"; 
         div.innerHTML = `
             <h4>Dependiente #${i + 1}</h4>
             <div class="grid-item">
@@ -373,8 +421,8 @@ function openDependentsModal(forEdit) {
                 <input type="text" id="modal_dep${i}_apellido" value="${dep.apellido || ''}" placeholder="Apellido del dependiente" required>
             </div>
             <div class="grid-item">
-                <label for="modal_dep${i}_fechaNacimiento">Fecha de nacimiento:</label>
-                <input type="date" id="modal_dep${i}_fechaNacimiento" value="${dep.fechaNacimiento || ''}">
+                <label for="modal_dep${i}_fechaNacimiento">Fecha de nacimiento (mm/dd/aaaa):</label>
+                <input type="text" id="modal_dep${i}_fechaNacimiento" value="${dep.fechaNacimiento || ''}" placeholder="MM/DD/AAAA" maxlength="10">
             </div>
             <div class="grid-item">
                 <label for="modal_dep${i}_estadoMigratorio">Estado migratorio:</label>
@@ -397,8 +445,35 @@ function openDependentsModal(forEdit) {
             </div>
         `;
         modalDependentsContainer.appendChild(div);
+
+        // Añadir listeners de máscara de fecha a los nuevos inputs del modal
+        const modalDepFechaNacimientoInput = document.getElementById(`modal_dep${i}_fechaNacimiento`);
+        if (modalDepFechaNacimientoInput) {
+            modalDepFechaNacimientoInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, ''); 
+                let formattedValue = '';
+                if (value.length > 0) {
+                    formattedValue = value.substring(0, 2); 
+                    if (value.length > 2) {
+                        formattedValue += '/' + value.substring(2, 4); 
+                    }
+                    if (value.length > 4) {
+                        formattedValue += '/' + value.substring(4, 8); 
+                    }
+                }
+                e.target.value = formattedValue;
+            });
+            modalDepFechaNacimientoInput.addEventListener('blur', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length === 8) { 
+                    e.target.value = `${value.substring(0,2)}/${value.substring(2,4)}/${value.substring(4,8)}`;
+                } else if (value.length > 0 && value.length < 8) {
+                    displayStatus("Formato de fecha incorrecto. Use MM/DD/AAAA.", 'error');
+                }
+            });
+        }
     }
-    dependentsModal.style.display = 'flex'; 
+    dependentsModal.classList.add('modal-show'); // Usar clase para mostrar
 }
 
 /**
@@ -444,33 +519,39 @@ dataForm.addEventListener("submit", async (e) => {
     displayStatus("Procesando...", 'info', 0); 
 
     try {
-        currentTitularClientId = `CLIENT-${Date.now()}-${Math.floor(Math.random() * 1000)}`; // Generar ID para este envío
+        currentTitularClientId = `CLIENT-${Date.now()}-${Math.floor(Math.random() * 1000)}`; 
 
         // --- Recolectar datos de la pestaña Obamacare (Principal) ---
         const titularData = {};
         const getInputValue = (id) => document.getElementById(id).value;
         
+        // Datos Personales (incluyendo campos movidos)
         titularData.nombre = getInputValue('nombre');
         titularData.apellidos = getInputValue('apellidos');
         titularData.sexo = getInputValue('sexo');
         titularData.correo = getInputValue('correo');
-        titularData.telefono = getInputValue('telefono');
-        titularData.fechaNacimiento = getInputValue('fechaNacimiento');
-        titularData.estadoMigratorio = getInputValue('estadoMigratorio');
-        titularData.aplica = getInputValue('aplica');
-        titularData.cantidadDependientes = getInputValue('cantidadDependientes');
-        
-        // Desformatear valores monetarios (eliminar '$' y luego parsear a number)
-        titularData.ingresos = parseFormattedMonetaryValue(getInputValue('ingresos'));
+        titularData.telefono = getInputValue('telefono'); 
+        titularData.fechaNacimiento = getInputValue('fechaNacimiento'); 
+        titularData.estadoMigratorio = getInputValue('estadoMigratorio'); 
         titularData.social = getInputValue('social'); 
+        titularData.ingresos = parseFormattedMonetaryValue(getInputValue('ingresos')); 
+        titularData.aplica = getInputValue('aplica'); 
+        titularData.cantidadDependientes = getInputValue('cantidadDependientes'); 
+        
+        // Dirección se procesa aparte
+        
+        // Información de la Póliza (campos restantes)
         titularData.compania = getInputValue('compania');
         titularData.plan = getInputValue('plan');
-        titularData.creditoFiscal = parseFormattedMonetaryValue(getInputValue('creditoFiscal'));
-        titularData.prima = parseFormattedMonetaryValue(getInputValue('prima'));
+        titularData.creditoFiscal = parseFormattedMonetaryValue(getInputValue('creditoFiscal')); 
+        titularData.prima = parseFormattedMonetaryValue(getInputValue('prima')); 
         titularData.link = getInputValue('link');
         titularData.observaciones = getInputValue('observaciones');
+        
+        // Metadata
         titularData.Fecha = new Date().toLocaleDateString('es-ES'); 
         titularData.clientId = currentTitularClientId;
+
 
         // Procesar la dirección consolidada
         let fullAddress = '';
@@ -540,12 +621,12 @@ dataForm.addEventListener("submit", async (e) => {
             paymentData.titularCuenta = getInputValue('titularCuenta');
             paymentData.socialCuenta = getInputValue('socialCuenta');
             // Asegurarse de que los campos de tarjeta no se envíen
-            paymentData.numTarjeta = ''; // No se envía la tarjeta completa
+            paymentData.numTarjeta = ''; 
             paymentData.fechaVencimiento = '';
             paymentData.titularTarjeta = '';
         } else if (paymentData.metodoPago === 'Tarjeta') {
             const fullCardNum = getInputValue('numTarjeta').replace(/\D/g, '');
-            paymentData.numTarjeta = fullCardNum.slice(-4); // ¡Solo se guardan los últimos 4 dígitos!
+            paymentData.numTarjeta = fullCardNum.slice(-4); 
             paymentData.fechaVencimiento = getInputValue('fechaVencimiento');
             // CVV/CVC NO SE RECOLECTA NI SE ENVÍA A NINGUNA PARTE POR SEGURIDAD
             paymentData.titularTarjeta = getInputValue('titularTarjeta');
@@ -643,26 +724,26 @@ async function appendObamacareDataToSheet(titularData, dependents) {
     const allRows = [];
 
     // Fila del titular para Obamacare
+    // ¡IMPORTANTE! El orden de estas columnas DEBE coincidir EXACTAMENTE con tu hoja de Google Sheets.
     const titularRow = [
         'Titular', 
         titularData.nombre || '',
         titularData.apellidos || '',
         titularData.sexo || '', 
         titularData.correo || '', 
-        titularData.direccion || '', 
-        titularData.telefono || '',
-        titularData.fechaNacimiento || '',
-        titularData.estadoMigratorio || '',
-        titularData.aplica || '', 
-        titularData.cantidadDependientes || '',
-        // Valores monetarios ya vienen formateados con $ del submit handler
-        titularData.ingresos || '', 
+        titularData.telefono || '', 
+        titularData.fechaNacimiento || '', 
+        titularData.estadoMigratorio || '', 
         titularData.social || '', 
+        titularData.ingresos || '', 
+        titularData.aplica || '', 
+        titularData.cantidadDependientes || '', 
+        titularData.direccion || '', 
         titularData.compania || '', 
         titularData.plan || '',
         titularData.creditoFiscal || '', 
         titularData.prima || '', 
-        titularData.link || '',
+        titularData.link || '', 
         titularData.observaciones || '', 
         titularData.Fecha || '', 
         titularData.documentos || '', 
@@ -674,13 +755,14 @@ async function appendObamacareDataToSheet(titularData, dependents) {
     dependents.forEach(dep => {
         const dependentRow = [
             dep.parentesco || '', 
-            dep.nombre || '',
-            dep.apellido || '',
-            '', '', '', '', // Vacío para Sexo, Correo, Dirección, Teléfono
-            dep.fechaNacimiento || '',
-            dep.estadoMigratorio || '',
-            dep.aplica || '',
-            '', '', '', '', '', '', '', '', '', '', '', // Vacío para Cantidad Dependientes, Ingresos, SSN, Compañía, Plan, Crédito Fiscal, Prima, Link, Observaciones, Fecha, Documentos
+            dep.nombre || '', 
+            dep.apellido || '', 
+            '', '', '', '', 
+            dep.fechaNacimiento || '', 
+            dep.estadoMigratorio || '', 
+            '', '', '', 
+            '', 
+            '', '', '', '', '', '', '', '', '', 
             dep.clientId || '' 
         ];
         allRows.push(dependentRow);
