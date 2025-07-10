@@ -1,293 +1,261 @@
-/* Estilos Generales */
+/* Importar fuentes de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Poppins:wght@400;600&display=swap');
+
+/* Estilos Generales y Fondo */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', sans-serif;
     margin: 0;
-    padding: 20px;
-    background-color: #f4f7f6;
+    padding: 0;
+    background: linear-gradient(to bottom right, #1a2a3a, #0d3b66); /* Azul oscuro a más oscuro */
+    color: #f8f9fa; /* Color de texto general para contraste en el fondo */
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
+    align-items: center; /* Centrar el contenido horizontalmente */
+    padding-top: 20px; /* Espacio superior */
+    padding-bottom: 40px; /* Espacio inferior */
+}
+
+.container {
+    max-width: 960px; /* Ancho máximo del contenido principal */
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Header con Logo Centrado */
+.main-header {
+    width: 100%;
+    padding: 20px 0;
+    text-align: center;
+    margin-bottom: 30px;
+}
+.main-header .logo-img {
+    max-height: 70px;
+    width: auto;
+    filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.5));
+}
+
+/* Título Principal Centrado */
+h2.main-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 2.8rem;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Contenedor Principal del Formulario */
 .form-container {
-    background-color: #ffffff;
-    padding: 30px 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 800px;
+    background-color: #213c54; /* Un azul/gris oscuro sólido */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    color: #f8f9fa; /* Texto claro */
+    width: 100%; /* Ocupar todo el ancho del contenedor */
     box-sizing: border-box;
-    margin-top: 20px;
 }
 
-/* Estilos de la rejilla (Grid) para dos columnas */
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas de igual ancho */
-    gap: 20px 30px; /* Espacio vertical y horizontal entre elementos */
-    margin-bottom: 20px;
+/* Sección del botón de inicio de sesión */
+.login-button-section {
+    text-align: center; /* Centrar el botón */
+    margin-bottom: 25px; /* Espacio debajo del botón */
 }
-
-.grid-item {
-    /* Estilos por defecto para los elementos de la rejilla */
-}
-
-.grid-item.full-width {
-    grid-column: 1 / -1; /* Hace que el elemento ocupe todas las columnas */
-}
-
-/* Encabezado y Logo */
-header {
-    text-align: center;
-    margin-bottom: 30px;
-    width: 100%;
-}
-
-#logo {
-    max-width: 150px; 
-    height: auto;
-    margin-bottom: 15px;
-    border-radius: 5px; 
-}
-
-h1 {
-    color: #333;
-    font-size: 2em;
-    margin-bottom: 25px;
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 10px;
-}
-
-h2 {
-    color: #555;
-    font-size: 1.5em;
-    margin-top: 30px;
-    margin-bottom: 20px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #eee;
-    grid-column: 1 / -1; /* Los subtítulos ocupan todo el ancho */
-}
-h3 {
-    color: #007bff;
-    font-size: 1.2em;
-    margin-top: 20px;
-    margin-bottom: 15px;
-    padding-bottom: 5px;
-    border-bottom: 1px dotted #ccc;
-    grid-column: 1 / -1;
-}
-
-/* Botones de Autenticación y Formulario */
-#loginBtn {
-    background-color: #4285F4; 
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 5px;
-    font-size: 1.1em;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    display: block;
-    margin: 0 auto 20px auto; 
-}
-#loginBtn:hover {
-    background-color: #357ae8;
-}
-#loginBtn:disabled {
-    background-color: #a6cbf7;
-    cursor: not-allowed;
-}
-
-#submitBtn, #generateDependentsBtn, #addDependentsBtn, #editDependentsBtn, #saveDependentsBtn {
-    background-color: #28a745; 
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 5px;
-    font-size: 1.1em;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 100%; /* Botón de envío ancho completo */
-    margin-top: 20px;
-    grid-column: 1 / -1; /* Ocupa todo el ancho en el grid */
-}
-#submitBtn:hover, #generateDependentsBtn:hover, #addDependentsBtn:hover, #editDependentsBtn:hover, #saveDependentsBtn:hover {
-    background-color: #218838;
-}
-#submitBtn:disabled, #generateDependentsBtn:disabled, #addDependentsBtn:disabled, #editDependentsBtn:disabled, #saveDependentsBtn:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
-}
-
-/* Campos del Formulario */
-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #444;
-    font-size: 0.95em;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="date"],
-input[type="number"], 
-input[type="url"],
-textarea,
-select { 
-    width: calc(100% - 24px); 
-    padding: 12px;
-    margin-bottom: 18px; 
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-sizing: border-box; 
-    font-size: 1em;
-    color: #333;
-    transition: border-color 0.3s ease;
-}
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="date"]:focus,
-input[type="number"]:focus, 
-input[type="url"]:focus,
-textarea:focus,
-select:focus { 
+#loginBtn.btn-login { /* Estilo específico para el botón de login */
+    background-color: #007bff; /* Azul de Google */
     border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+    color: white;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    border-radius: 8px; /* Más redondeado */
+    width: auto; /* Ancho automático, no 100% */
+    display: inline-block; /* Para que se centre con text-align: center */
+    max-width: 300px; /* Limita el ancho del botón */
 }
-
-input[type="file"] {
-    padding: 8px 0;
-    margin-bottom: 18px;
-    font-size: 1em;
-    grid-column: 1 / -1; 
-}
-
-input[type="checkbox"], input[type="radio"] {
-    margin-right: 8px;
-    transform: scale(1.2); 
-    vertical-align: middle; /* Alinea con el texto de la label */
-}
-input[type="radio"] + label {
-    display: inline-block; /* Para que las labels de radio estén en línea con el radio */
-    margin-right: 20px;
-    font-weight: normal;
+#loginBtn.btn-login:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    transform: translateY(-2px);
 }
 
 
-textarea {
-    resize: vertical; 
-    min-height: 80px;
+/* Estilos de las Tarjetas (Secciones del Formulario) */
+.card {
+    background-color: #2a4c6a; /* Fondo un poco más claro que el form-container para las tarjetas */
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 20px;
 }
-
-/* Mensajes de Estado */
-#status {
-    margin-top: 25px;
+.card-header {
+    background-color: #0d3b66; /* Azul más oscuro para los encabezados */
+    color: white;
     padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px 10px 0 0;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 1.2rem;
+}
+.card-body {
+    padding: 20px;
+}
+
+/* Estilos de los Campos del Formulario */
+.form-label {
+    color: #b0c4de; /* Etiquetas claras para contraste */
+    font-weight: 400;
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+}
+.form-control, .form-select, textarea {
+    background-color: rgba(255, 255, 255, 0.08); /* Fondo transparente para los inputs */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Borde sutil */
+    color: #f8f9fa; /* Texto claro en los inputs */
+    padding: 0.7rem 1rem;
+    border-radius: 8px; /* Bordes redondeados */
+    font-size: 0.9rem;
+    width: 100%; 
+    box-sizing: border-box;
+}
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4); /* Placeholder más tenue pero visible */
+}
+.form-control:focus, .form-select:focus, textarea:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: #007bff; 
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+}
+.form-select option {
+    background-color: #213c54; /* Fondo oscuro para opciones */
+    color: #f8f9fa; /* Texto claro */
+}
+/* Estilo específico para input type="file" */
+.form-control[type="file"] {
+    padding: 0.7rem 1rem;
+}
+/* Para que el botón de seleccionar archivo se vea bien */
+.form-control[type="file"]::-webkit-file-upload-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.5rem 0.8rem;
     border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.2s;
+}
+.form-control[type="file"]::-webkit-file-upload-button:hover {
+    background-color: #0056b3;
+}
+
+
+/* Botones (General) */
+.btn { 
+    display: inline-block;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    text-align: center;
+    vertical-align: middle;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.btn-primary { 
+    background-color: #007bff; 
+    border-color: #007bff;
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    transform: translateY(-2px);
+}
+.btn-success { 
+    background-color: #28a745; 
+    border-color: #28a745;
+    color: white;
+}
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+    transform: translateY(-2px);
+}
+.btn-secondary { 
+    background-color: #6c757d; 
+    border-color: #6c757d;
+    color: white;
+}
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+    transform: translateY(-2px);
+}
+
+
+/* Mensajes de estado (éxito/error) */
+#statusMessage { 
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
     text-align: center;
     font-weight: bold;
-    font-size: 1.05em;
+    font-size: 1rem;
+    color: white; 
     opacity: 0; 
     transition: opacity 0.5s ease-in-out, background-color 0.5s ease-in-out, color 0.5s ease-in-out;
     grid-column: 1 / -1; 
 }
-#status.visible {
-    opacity: 1; 
+#statusMessage.visible { 
+    opacity: 1;
 }
-#status.error {
-    background-color: #ffe0e0; 
-    color: #d32f2f; 
-    border: 1px solid #d32f2f;
-}
-#status.success {
-    background-color: #e6ffed; 
-    color: #28a745; 
-    border: 1px solid #28a745;
-}
-#status.info {
-    background-color: #e0f2ff; 
-    color: #007bff; 
-    border: 1px solid #007bff;
-}
+#statusMessage.alert-success { background-color: #28a745; border-color: #28a745; }
+#statusMessage.alert-danger { background-color: #dc3545; border-color: #dc3545; }
+#statusMessage.alert-info { background-color: #007bff; border-color: #007bff; } 
 
-/* Estilos para el contenedor de los dependientes dentro del modal (cascada) */
-.dependent-card {
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    /* Remover display grid y gaps para forzar cascada interna */
-    /* display: grid; */
-    /* grid-template-columns: 1fr 1fr; */
-    /* gap: 15px 20px; */
-}
-/* Asegura que los grid-item dentro de dependent-card ocupen todo el ancho para la cascada */
-.dependent-card .grid-item {
-    grid-column: 1 / -1; 
-}
-
-
-/* Pequeños ajustes para campos opcionales o con formato específico */
-.hint {
-    font-size: 0.85em;
-    color: #777;
-    margin-top: -10px;
-    margin-bottom: 15px;
-    display: block;
-}
-
-/* Estilo para los select para quitar la flecha por defecto y añadir una custom */
-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 20px;
-    padding-right: 30px; 
-}
 
 /* Estilos de Pestañas (Tabs) */
 .tabs-nav {
     display: flex;
     justify-content: flex-start;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: 0; 
+    border-bottom: 2px solid #34495e; 
 }
 
 .tab-button {
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    border-bottom: none;
+    background-color: #34495e; 
+    border: 1px solid #4a6681; 
+    border-bottom: none; 
     padding: 10px 20px;
     cursor: pointer;
     font-size: 1em;
     font-weight: 600;
-    color: #555;
+    color: #b0c4de; 
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     margin-right: 5px; 
 }
 
 .tab-button:hover:not(.active) {
-    background-color: #e6e6e6;
-    color: #333;
+    background-color: #4a6681; 
+    color: #f8f9fa; 
 }
 
 .tab-button.active {
-    background-color: #007bff;
+    background-color: #007bff; 
     color: white;
     border-color: #007bff;
-    box-shadow: 0 -2px 5px rgba(0, 123, 255, 0.2);
+    box-shadow: 0 -2px 8px rgba(0, 123, 255, 0.4); 
     z-index: 1; 
     position: relative;
+    border-bottom-color: transparent; 
 }
 
 .tab-content {
@@ -297,34 +265,47 @@ select {
 }
 
 
-/* Estilos del Modal */
+/* Estilos del Modal (CORRECCIÓN CLAVE AQUÍ) */
 .modal {
-    display: none; 
-    position: fixed; 
-    z-index: 1000; 
+    position: fixed; /* Fijo en la pantalla */
+    z-index: 1000; /* Siempre encima */
     left: 0;
     top: 0;
     width: 100%; 
     height: 100%; 
     overflow: auto; 
-    background-color: rgba(0,0,0,0.4); 
-    display: flex; 
+    background-color: rgba(0,0,0,0.8); /* Overlay más oscuro */
+    
+    /* ¡CAMBIO CRÍTICO! Por defecto, está oculto con 'display: none'. */
+    /* Las propiedades de display y centrado se aplican con la clase .modal-show */
+    display: none; /* Asegura que esté oculto por defecto */
+}
+
+/* Nueva clase para mostrar el modal con Flexbox y centrado */
+.modal.modal-show {
+    display: flex; /* Esto lo hace visible y lo centra */
     align-items: center; 
     justify-content: center; 
 }
 
+
 .modal-content {
-    background-color: #fefefe;
-    margin: auto;
-    padding: 30px;
-    border: 1px solid #888;
-    border-radius: 10px;
+    background-color: #2a4c6a; 
+    color: #f8f9fa; 
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
     width: 90%; 
     max-width: 700px; 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     position: relative;
     animation: fadeIn 0.3s; 
     box-sizing: border-box; 
+    display: flex; 
+    flex-direction: column;
+    max-height: 90vh; 
+}
+.modal-body {
+    padding: 30px;
+    overflow-y: auto; 
 }
 
 @keyframes fadeIn {
@@ -332,29 +313,123 @@ select {
     to { opacity: 1; transform: translateY(0); }
 }
 
+.modal-header {
+    background-color: #0d3b66; 
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 1.8rem;
+    margin: 0; 
+    color: white; 
+}
 .close-button {
-    color: #aaa;
-    position: absolute;
-    right: 20px;
-    top: 10px;
-    font-size: 28px;
+    color: #fff; 
+    font-size: 2rem; 
     font-weight: bold;
     cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
 }
-
 .close-button:hover,
 .close-button:focus {
-    color: black;
+    opacity: 1;
     text-decoration: none;
-    cursor: pointer;
+}
+.modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 20px;
+    display: flex;
+    justify-content: flex-end; 
+}
+.modal-footer .btn {
+    font-weight: 600;
+    width: auto; 
 }
 
-/* Ajustes para los campos dentro del modal (usan form-grid también) */
-#modalDependentsContainer {
-    margin-top: 20px;
-    padding-top: 0;
-    border-top: none;
+/* Estilos para las tarjetas de dependientes dentro del modal (cascada) */
+.dependent-card {
+    background-color: rgba(255, 255, 255, 0.08); 
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    padding: 20px;
+    margin-bottom: 20px; 
+    border-radius: 10px;
+    color: #f8f9fa; 
 }
-#modalDependentsContainer .dependent-card:last-child {
+.dependent-card .grid-item {
+    grid-column: 1 / -1; 
+    margin-bottom: 10px; 
+}
+.dependent-card .grid-item:last-child {
     margin-bottom: 0; 
+}
+.dependent-card h4 {
+    color: #74ccf4; 
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.3rem;
+    border-bottom: 1px dotted rgba(255, 255, 255, 0.2);
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+    grid-column: 1 / -1;
+}
+
+/* Espaciado para los botones de dependientes */
+.buttons-dependent-section {
+    margin-top: 20px; 
+    display: flex; 
+    justify-content: center; 
+    gap: 10px; 
+    flex-wrap: wrap; 
+}
+.buttons-dependent-section .btn {
+    width: auto; 
+    max-width: 200px; 
+}
+
+
+/* Responsividad */
+@media (max-width: 768px) {
+    h2.main-title {
+        font-size: 2.2rem;
+    }
+    .form-container {
+        padding: 20px;
+    }
+    .card-header {
+        font-size: 1.1rem;
+    }
+    .form-control, .form-select, textarea {
+        font-size: 0.85rem;
+        padding: 0.6rem 0.8rem;
+    }
+    .form-label {
+        font-size: 0.9rem;
+    }
+    .form-grid {
+        grid-template-columns: 1fr; 
+    }
+    .grid-item.full-width {
+        grid-column: 1; 
+    }
+    .modal-content {
+        width: 95%; 
+    }
+    .modal-body {
+        padding: 20px;
+    }
+    .modal-header .modal-title {
+        font-size: 1.5rem;
+    }
+    .close-button {
+        font-size: 1.8rem;
+    }
 }
