@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Pólizas de Cliente</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body>
+    <header>
+        <img id="logo" src="https://via.placeholder.com/150x50?text=Tu+Logo+Aquí" alt="Logo de la Empresa"> 
+        <h1>Registro de Pólizas de Cliente</h1>
+    </header>
+
+    <div class="form-container">
+        <button id="loginBtn">Iniciar sesión con Google</button>
+        
+        <form id="dataForm">
+            <nav class="tabs-nav">
+                <button type="button" class="tab-button active" data-tab="obamacare">Obamacare</button>
+                <button type="button" class="tab-button" data-tab="cigna">Cigna Complementario</button>
+                <button type="button" class="tab-button" data-tab="pagos">Pagos</button>
+            </nav>
+
+            <div class="tab-content" id="tab-obamacare">
+                <div class="form-grid">
+                    <h2>Datos Personales</h2>
+                    <div class="grid-item">
+                        <label for="nombre">Nombre:</label>
+                        <input type="text" id="nombre" name="nombre" placeholder="Nombre del titular" required><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="apellidos">Apellidos:</label>
+                        <input type="text" id="apellidos" name="apellidos" placeholder="Apellidos del titular" required><br>
+                    </div>
+                    
+                    <div class="grid-item">
+                        <label for="sexo">Sexo:</label>
+                        <select id="sexo" name="sexo">
+                            <option value="">Selecciona...</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro</option>
+                        </select><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="correo">Correo Electrónico:</label>
+                        <input type="email" id="correo" name="correo" placeholder="ejemplo@dominio.com"><br>
+                    </div>
+
+                    <div class="grid-item full-width">
+                        <h2>Dirección</h2>
+                    </div>
+                    <div class="grid-item">
+                        <label for="direccionCalle">Dirección (Calle y Número):</label>
+                        <input type="text" id="direccionCalle" name="direccionCalle" placeholder="Calle y número"><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="casaApartamento">Casa o Apartamento:</label>
+                        <input type="text" id="casaApartamento" name="casaApartamento" placeholder="Casa o apartamento"><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="condado">Condado:</label>
+                        <input type="text" id="condado" name="condado" placeholder="Condado"><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="ciudad">Ciudad:</label>
+                        <input type="text" id="ciudad" name="ciudad" placeholder="Ciudad"><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="zipCode">Zip Code:</label>
+                        <input type="text" id="zipCode" name="zipCode" placeholder="Código postal" pattern="\d{5}(?:-\d{4})?"><br>
+                    </div>
+                    <div class="grid-item full-width">
+                        <label>
+                            <input type="checkbox" id="hasPoBox" name="hasPoBox"> ¿Tiene PO BOX?
+                        </label>
+                    </div>
+                    <div class="grid-item full-width" id="poBoxAddressContainer" style="display: none;">
+                        <label for="direccionPoBox">Dirección de PO BOX:</label>
+                        <input type="text" id="direccionPoBox" name="direccionPoBox" placeholder="Dirección PO BOX"><br>
+                    </div>
+                    
+                    <div class="grid-item">
+                        <label for="telefono">Teléfono:</label>
+                        <input type="text" id="telefono" name="telefono" placeholder="Número de teléfono"><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="fechaNacimiento">Fecha de nacimiento:</label>
+                        <input type="date" id="fechaNacimiento" name="fechaNacimiento"><br>
+                    </div>
+                    <div class="grid-item full-width">
+                        <label for="estadoMigratorio">Estado Migratorio:</label>
+                        <select id="estadoMigratorio" name="estadoMigratorio">
+                            <option value="">Selecciona...</option>
+                            <option value="Ciudadano">Ciudadano</option>
+                            <option value="Residente">Residente</option>
+                            <option value="Permiso de Trabajo">Permiso de Trabajo</option>
+                            <option value="Asilo Político">Asilo Político</option>
+                            <option value="I-94">I-94</option>
+                            <option value="Otro">Otro</option>
+                        </select><br>
+                    </div>
+
+                    <div class="grid-item full-width">
+                        <h2>Información de la Póliza</h2>
+                    </div>
+                    <div class="grid-item">
+                        <label for="aplica">Aplica:</label>
+                        <select id="aplica" name="aplica">
+                            <option value="">Selecciona...</option>
+                            <option value="Sí">Sí</option>
+                            <option value="No">No</option>
+                        </select><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="cantidadDependientes">Cantidad de dependientes:</label>
+                        <input type="number" id="cantidadDependientes" name="cantidadDependientes" min="0" value="0"><br>
+                    </div>
+                    <div class="grid-item full-width">
+                        <button type="button" id="editDependentsBtn" style="display:none;">Editar Dependientes</button>
+                        <button type="button" id="addDependentsBtn" style="display:none;">Agregar Dependientes</button>
+                    </div>
+                    
+                    <div class="grid-item">
+                        <label for="ingresos">Ingresos (USD):</label>
+                        <input type="text" id="ingresos" name="ingresos" placeholder="Monto de ingresos"><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="social">Social (SSN):</label>
+                        <input type="text" id="social" name="social" placeholder="Número de Seguro Social (si aplica)" maxlength="11"><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="compania">Compañía Aseguradora:</label>
+                        <select id="compania" name="compania">
+                            <option value="">Selecciona...</option>
+                            <option value="Aetna">Aetna</option>
+                            <option value="Ambetter">Ambetter</option>
+                            <option value="Ameri HealthCaritas Next">Ameri HealthCaritas Next</option>
+                            <option value="Baylor">Baylor</option>
+                            <option value="Blue Cross and Blue Shield">Blue Cross and Blue Shield</option>
+                            <option value="Cigna">Cigna</option>
+                            <option value="Community Health Choice">Community Health Choice</option>
+                            <option value="Florida Blue">Florida Blue</option>
+                            <option value="Health Firts">Health Firts</option>
+                            <option value="Imperial Insurance">Imperial Insurance</option>
+                            <option value="Molina">Molina</option>
+                            <option value="Oscar">Oscar</option>
+                            <option value="United HealthCare">United HealthCare</option>
+                            <option value="WellPoint">WellPoint</option>
+                        </select><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="plan">Plan de Salud:</label>
+                        <input type="text" id="plan" name="plan" placeholder="Nombre específico del plan de salud"><br>
+                        <span class="hint">Indica el nombre específico del plan de salud.</span>
+                    </div>
+                    <div class="grid-item">
+                        <label for="creditoFiscal">Crédito fiscal (USD):</label>
+                        <input type="text" id="creditoFiscal" name="creditoFiscal" placeholder="Monto del crédito fiscal (si aplica)"><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="prima">Prima (USD):</label>
+                        <input type="text" id="prima" name="prima" placeholder="Costo de la prima"><br>
+                    </div>
+                    <div class="grid-item full-width">
+                        <label for="link">Link de la Póliza (URL):</label>
+                        <input type="url" id="link" name="link" placeholder="https://enlace-a-la-poliza.com"><br>
+                    </div>
+                    <div class="grid-item full-width">
+                        <label for="observaciones">Observaciones:</label>
+                        <textarea id="observaciones" name="observaciones" placeholder="Añade cualquier nota relevante aquí, como condiciones especiales o historial..."></textarea><br>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-cigna" style="display:none;">
+                <div class="form-grid">
+                    <h2>Información Cigna Complementario</h2>
+                    <div class="grid-item">
+                        <label for="cignaPlanTipo">Tipo de plan complementario:</label>
+                        <input type="text" id="cignaPlanTipo" name="cignaPlanTipo" placeholder="Ej: Plan Plus, etc."><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="cignaCoberturaTipo">Tipo de cobertura:</label>
+                        <input type="text" id="cignaCoberturaTipo" name="cignaCoberturaTipo" placeholder="Ej: Dental, Visión, etc."><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="cignaBeneficio">Beneficio de:</label>
+                        <input type="text" id="cignaBeneficio" name="cignaBeneficio" placeholder="Descripción del beneficio"><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="cignaDeducible">Deducible:</label>
+                        <input type="text" id="cignaDeducible" name="cignaDeducible" placeholder="Monto deducible"><br>
+                    </div>
+                    <div class="grid-item">
+                        <label for="cignaMensualidad">Mensualidad:</label>
+                        <input type="text" id="cignaMensualidad" name="cignaMensualidad" placeholder="Monto mensual"><br>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-pagos" style="display:none;">
+                <div class="form-grid">
+                    <h2>Método de Pago</h2>
+                    <div class="grid-item full-width">
+                        <label>Selecciona el método de pago:</label>
+                        <input type="radio" id="pagoBanco" name="metodoPago" value="Banco">
+                        <label for="pagoBanco">Cuenta de Banco</label>
+                        <input type="radio" id="pagoTarjeta" name="metodoPago" value="Tarjeta">
+                        <label for="pagoTarjeta">Tarjeta</label>
+                    </div>
+
+                    <div id="pagoBancoContainer" class="grid-item full-width" style="display:none;">
+                        <h3>Datos de Cuenta de Banco</h3>
+                        <div class="grid-item">
+                            <label for="numCuenta">Número de Cuenta:</label>
+                            <input type="text" id="numCuenta" name="numCuenta" placeholder="Número de cuenta bancaria"><br>
+                        </div>
+                        <div class="grid-item">
+                            <label for="numRuta">Número de Ruta:</label>
+                            <input type="text" id="numRuta" name="numRuta" placeholder="Número de ruta bancaria"><br>
+                        </div>
+                        <div class="grid-item">
+                            <label for="nombreBanco">Nombre del Banco:</label>
+                            <input type="text" id="nombreBanco" name="nombreBanco" placeholder="Nombre del banco"><br>
+                        </div>
+                        <div class="grid-item">
+                            <label for="titularCuenta">Titular de la Cuenta:</label>
+                            <input type="text" id="titularCuenta" name="titularCuenta" placeholder="Nombre del titular de la cuenta"><br>
+                        </div>
+                        <div class="grid-item">
+                            <label for="socialCuenta">Número Social (Cuenta):</label>
+                            <input type="text" id="socialCuenta" name="socialCuenta" placeholder="SSN del titular de la cuenta" maxlength="11"><br>
+                        </div>
+                    </div>
+
+                    <div id="pagoTarjetaContainer" class="grid-item full-width" style="display:none;">
+                        <h3>Datos de Tarjeta</h3>
+                        <div class="grid-item">
+                            <label for="numTarjeta">Número de Tarjeta:</label>
+                            <input type="text" id="numTarjeta" name="numTarjeta" placeholder="XXXX XXXX XXXX XXXX" maxlength="19"><br>
+                        </div>
+                        <div class="grid-item">
+                            <label for="fechaVencimiento">Fecha de Vencimiento:</label>
+                            <input type="text" id="fechaVencimiento" name="fechaVencimiento" placeholder="MM/AA" maxlength="5"><br>
+                        </div>
+                        <div class="grid-item">
+                            <label for="cvc">CVC/CVV:</label>
+                            <input type="text" id="cvc" name="cvc" placeholder="XXX" maxlength="4"><br>
+                        </div>
+                        <div class="grid-item full-width">
+                            <label for="titularTarjeta">Nombre del Titular de la Tarjeta:</label>
+                            <input type="text" id="titularTarjeta" name="titularTarjeta" placeholder="Nombre completo del titular"><br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn" disabled>Enviar Datos Completos</button>
+        </form>
+
+        <div id="status"></div>
+    </div>
+
+    <div id="dependentsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Detalle de Dependientes</h2>
+            <div id="modalDependentsContainer" class="form-grid">
+                </div>
+            <button type="button" id="saveDependentsBtn">Guardar Dependientes</button>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
