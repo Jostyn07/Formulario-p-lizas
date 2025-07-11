@@ -1,7 +1,3 @@
-// main.js - Versión 2025-07-10-18:40:00 (Final para usuario)
-// Importante: Eliminar console.logs para versión final de producción
-//            El cache-busting en index.html fuerza la recarga.
-
 const clientId = "64713983477-nk4rmn95cgjsnab4gmp44dpjsdp1brk2.apps.googleusercontent.com";
 const SPREADSHEET_ID = "1T8YifEIUU7a6ugf_Xn5_1edUUMoYfM9loDuOQU1u2-8"; // ID de tu Google Sheet
 const SHEET_NAME_OBAMACARE = "Pólizas"; // Nombre de la hoja principal
@@ -309,7 +305,7 @@ cantidadDependientesInput.addEventListener('input', () => {
             addDependentsBtn.style.display = 'block';
         }
         
-        // El modal YA NO se abre automáticamente aquí. Solo se abre con click.
+        // El modal YA NO se abre automáticamente aquí. Solo se abrirá con click.
     } else { // num === 0
         currentDependentsData = []; 
         addDependentsBtn.style.display = 'none';
@@ -740,114 +736,145 @@ async function appendObamacareDataToSheet(titularData, dependents) {
         titularData.cantidadDependientes || '', 
         titularData.direccion || '', 
         titularData.compania || '', 
-        titularData.plan || '',
+        titularData.plan || '', 
         titularData.creditoFiscal || '', 
         titularData.prima || '', 
         titularData.link || '', 
         titularData.observaciones || '', 
         titularData.Fecha || '', 
-        titularData.documentos || '', 
-        titularData.clientId || '' 
+        titularData.clientId || '', // Aquí va el Client ID del titular
+        titularData.documentos || ''
     ];
     allRows.push(titularRow);
 
-    // Filas de dependientes para Obamacare
+    // Filas de los dependientes
+    // Asegúrate de que el orden de estas columnas coincida con las columnas de dependientes en tu hoja
+    // Y que el clientId del titular se incluya para vincularlos.
     dependents.forEach(dep => {
         const dependentRow = [
-            dep.parentesco || '', 
-            dep.nombre || '', 
-            dep.apellido || '', 
-            '', '', '', '', 
-            dep.fechaNacimiento || '', 
-            dep.estadoMigratorio || '', 
-            '', '', '', 
-            '', 
-            '', '', '', '', '', '', '', '', '', 
-            dep.clientId || '' 
+            'Dependiente', // Tipo de registro
+            dep.nombre || '',
+            dep.apellido || '',
+            dep.parentesco || '', // Parentesco del dependiente
+            dep.fechaNacimiento || '', // Fecha de nacimiento del dependiente
+            dep.estadoMigratorio || '', // Estado migratorio del dependiente
+            dep.aplica || '', // Aplica del dependiente
+            '', // Deja vacío si no hay correo para dependientes
+            '', // Deja vacío si no hay teléfono para dependientes
+            '', // Deja vacío si no hay SSN para dependientes
+            '', // Deja vacío si no hay ingresos para dependientes
+            '', // Deja vacío si no hay aplica para dependientes (ya está en la columna de dependientes)
+            '', // Deja vacío si no hay dirección para dependientes
+            '', // Deja vacío si no hay compañía para dependientes
+            '', // Deja vacío si no hay plan para dependientes
+            '', // Deja vacío si no hay crédito fiscal para dependientes
+            '', // Deja vacío si no hay prima para dependientes
+            '', // Deja vacío si no hay link para dependientes
+            '', // Deja vacío si no hay observaciones para dependientes
+            titularData.Fecha || '', // Misma fecha que el titular
+            titularData.clientId || '', // ¡AQUÍ SE AÑADE EL CLIENT ID DEL TITULAR!
+            '' // Deja vacío si no hay documentos para dependientes
         ];
         allRows.push(dependentRow);
     });
 
-    const params = {
-        spreadsheetId: SPREADSHEET_ID,
-        range: `${SHEET_NAME_OBAMACARE}!A:Z`, 
-        valueInputOption: "USER_ENTERED", 
-        insertDataOption: "INSERT_ROWS", 
+    const resource = {
+        values: allRows,
     };
-    const requestBody = { values: allRows };
 
     try {
-        const response = await gapi.client.sheets.spreadsheets.values.append(params, requestBody);
-        console.log("Datos Obamacare/Pólizas escritos:", response);
+        const response = await gapi.client.sheets.spreadsheets.values.append({
+            spreadsheetId: SPREADSHEET_ID,
+            range: `${SHEET_NAME_OBAMACARE}!A:Z`, // Asegúrate de que el rango cubra todas tus columnas
+            valueInputOption: 'USER_ENTERED',
+            resource: resource,
+        });
+        if (response.status !== 200) {
+            throw new Error(`Error al añadir datos a la hoja '${SHEET_NAME_OBAMACARE}': ${response.result.error.message}`);
+        }
     } catch (error) {
-        console.error("Error al escribir en hoja Obamacare:", error);
-        throw new Error("Error al escribir datos Obamacare: " + (error.result?.error?.message || error.message));
+        console.error("Error al añadir datos a la hoja de Obamacare:", error);
+        throw new Error("No se pudieron guardar los datos del titular/dependientes en la hoja principal.");
     }
 }
 
+
 /**
- * Añade los datos de Cigna Complementario a su hoja dedicada.
+ * Añade los datos de Cigna Complementario a su hoja.
  * @param {object} cignaData - Objeto con los datos de Cigna.
  */
 async function appendCignaDataToSheet(cignaData) {
     gapi.client.setToken({ access_token: accessToken });
 
-    const values = [[
-        cignaData.clientId || '',
+    // ¡IMPORTANTE! El orden de estas columnas DEBE coincidir EXACTAMENTE con tu hoja de Cigna.
+    const row = [
+        cignaData.clientId || '', // Client ID para vincular
         cignaData.planTipo || '',
         cignaData.coberturaTipo || '',
         cignaData.beneficio || '',
         cignaData.deducible || '',
-        cignaData.mensualidad || ''
-    ]];
+        cignaData.mensualidad || '',
+        new Date().toLocaleDateString('es-ES') // Fecha de registro
+    ];
 
-    const params = {
-        spreadsheetId: SPREADSHEET_ID,
-        range: `${SHEET_NAME_CIGNA}!A:F`, 
-        valueInputOption: "USER_ENTERED", 
-        insertDataOption: "INSERT_ROWS", 
+    const resource = {
+        values: [row],
     };
-    const requestBody = { values: values };
 
     try {
-        const response = await gapi.client.sheets.spreadsheets.values.append(params, requestBody);
-        console.log("Datos Cigna Complementario escritos:", response);
+        const response = await gapi.client.sheets.spreadsheets.values.append({
+            spreadsheetId: SPREADSHEET_ID,
+            range: `${SHEET_NAME_CIGNA}!A:G`, // Ajusta el rango a tus columnas de Cigna
+            valueInputOption: 'USER_ENTERED',
+            resource: resource,
+        });
+        if (response.status !== 200) {
+            throw new Error(`Error al añadir datos a la hoja '${SHEET_NAME_CIGNA}': ${response.result.error.message}`);
+        }
     } catch (error) {
-        console.error("Error al escribir en hoja Cigna Complementario:", error);
-        throw new Error("Error al escribir datos Cigna: " + (error.result?.error?.message || error.message));
+        console.error("Error al añadir datos a la hoja de Cigna Complementario:", error);
+        throw new Error("No se pudieron guardar los datos de Cigna Complementario.");
     }
 }
 
 /**
- * Añade los datos de Pagos a su hoja dedicada.
- * @param {object} paymentData - Objeto con los datos de pago.
+ * Añade los datos de Pagos a su hoja.
+ * @param {object} paymentData - Objeto con los datos de Pagos.
  */
 async function appendPaymentDataToSheet(paymentData) {
     gapi.client.setToken({ access_token: accessToken });
 
-    // Los valores de tarjeta y CVV ya se manejan para no guardar datos sensibles.
-    const values = [[
-        paymentData.clientId || '',
+    // ¡IMPORTANTE! El orden de estas columnas DEBE coincidir EXACTAMENTE con tu hoja de Pagos.
+    const row = [
+        paymentData.clientId || '', // Client ID para vincular
         paymentData.metodoPago || '',
-        paymentData.numCuenta || paymentData.numTarjeta || '', // Consolidado: Número de Cuenta o ÚLTIMOS 4 DÍGITOS de Tarjeta
-        paymentData.numRuta || paymentData.fechaVencimiento || '', // Consolidado: Número de Ruta o Fecha Vencimiento
-        paymentData.nombreBanco || paymentData.titularTarjeta || '', // Consolidado: Nombre Banco o Titular Tarjeta
-        paymentData.socialCuenta || '' // Solo para cuenta bancaria
-    ]];
+        paymentData.numCuenta || '',
+        paymentData.numRuta || '',
+        paymentData.nombreBanco || '',
+        paymentData.titularCuenta || '',
+        paymentData.socialCuenta || '',
+        paymentData.numTarjeta || '', // Solo los últimos 4 dígitos
+        paymentData.fechaVencimiento || '',
+        paymentData.titularTarjeta || '',
+        new Date().toLocaleDateString('es-ES') // Fecha de registro
+    ];
 
-    const params = {
-        spreadsheetId: SPREADSHEET_ID,
-        range: `${SHEET_NAME_PAGOS}!A:F`, 
-        valueInputOption: "USER_ENTERED", 
-        insertDataOption: "INSERT_ROWS", 
+    const resource = {
+        values: [row],
     };
-    const requestBody = { values: values };
 
     try {
-        const response = await gapi.client.sheets.spreadsheets.values.append(params, requestBody);
-        console.log("Datos Pagos escritos:", response);
+        const response = await gapi.client.sheets.spreadsheets.values.append({
+            spreadsheetId: SPREADSHEET_ID,
+            range: `${SHEET_NAME_PAGOS}!A:K`, // Ajusta el rango a tus columnas de Pagos
+            valueInputOption: 'USER_ENTERED',
+            resource: resource,
+        });
+        if (response.status !== 200) {
+            throw new Error(`Error al añadir datos a la hoja '${SHEET_NAME_PAGOS}': ${response.result.error.message}`);
+        }
     } catch (error) {
-        console.error("Error al escribir en hoja Pagos:", error);
-        throw new Error("Error al escribir datos de pagos: " + (error.result?.error?.message || error.message));
+        console.error("Error al añadir datos a la hoja de Pagos:", error);
+        throw new Error("No se pudieron guardar los datos de Pagos.");
     }
 }
